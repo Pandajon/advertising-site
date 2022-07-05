@@ -43,15 +43,16 @@ const signup = async(req,res)=> {
 
 
 const signin = async(req,res)=> {
+try {
     const userExist = await User.findOne({email: req.body.email})
     if(userExist){
         const pm = await bcrypt.compare(req.body.password, userExist.password)
         if(pm){
             req.session.user = userExist
             req.session.isLogged = true
-            req.session.save(err=>{
+            req.session.save(err=> {
                 if(err) throw err
-                res.redirect('/profile' + req.session.user.username)
+                res.redirect('/profile/' + req.session.user.username)
             })
         }else{
             res.redirect('/auth/signin')
@@ -59,7 +60,10 @@ const signin = async(req,res)=> {
     }else{
         res.redirect('/auth/signin')
     }
-}
+} catch (err) {
+    console.log(err)
+}}
+
 
 module.exports = {
     getSignupPage,

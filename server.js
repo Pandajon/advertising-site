@@ -32,6 +32,7 @@ app.engine('.hbs', exphbs({ extname: '.hbs' }))
 app.set('view engine', '.hbs')
 
 app.use('/auth/', require('./router/authR'))
+app.use('/profile', require('./router/userR'))
 
 const port = process.env.PORT || 8080
 app.listen(port, ()=> {
