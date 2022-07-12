@@ -1,40 +1,41 @@
-const express = require('express')
-const path = require('path')
-const dotenv = require('dotenv')
-const connectDB = require('./config/db')
-const exphbs = require('express-handlebars')
-const session = require('express-session')
-const MongoStore = require('connect-mongodb-session')(session)
-const app = express()
-dotenv.config()
-connectDB()
+const express = require("express");
+const path = require("path");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const exphbs = require("express-handlebars");
+const session = require("express-session");
+const MongoStore = require("connect-mongodb-session")(session);
+dotenv.config();
+connectDB();
+const app = express();
 
 const store = new MongoStore({
     uri: process.env.MONGO_URI,
-    collection: "session"
-})
+    collection: "session",
+});
 
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store,
+    })
+);
 
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave:false,
-    saveUninitialized: false,
-    store
-}))
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.engine(".hbs", exphbs({ extname: ".hbs" }));
+app.set("view engine", ".hbs");
 
+app.use("/auth/", require("./router/authR"));
+app.use("/profile", require("./router/userR"));
+app.use("/posters", require("./router/postersR"));
 
-app.engine('.hbs', exphbs({ extname: '.hbs' }))
-app.set('view engine', '.hbs')
-
-app.use('/auth/', require('./router/authR'))
-app.use('/profile', require('./router/userR'))
-
-const port = process.env.PORT || 8080
-app.listen(port, ()=> {
-    console.log(`run server on port http:localhost:${port}`)
-})
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+    console.log(`run server on port http:localhost:${port}`);
+});

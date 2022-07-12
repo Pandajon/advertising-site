@@ -21,6 +21,7 @@ const userSchema = new Schema({
         required: true,
         minLength: 6
     },
+    posters: [{ type: Schema.Types.ObjectId, ref: 'Poster' }]
 }, {
     timestamps: true
 })
@@ -28,5 +29,3 @@ const userSchema = new Schema({
 module.exports = model('User', userSchema)
 
 
-
-// posters: [{type: Schema.Types.ObjectId, ref: 'Poster'}]
